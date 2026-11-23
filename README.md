@@ -70,21 +70,26 @@ account key or your `.env` file.**
 ### Run
 
 ```bash
-uvicorn main:app --reload
+python setup_demo.py        # creates a demo cafe in the local database
+uvicorn app:app --reload
 ```
 
-<!-- TODO: replace `main:app` with the real entry point of the web app -->
+Then open the pages served by the app (customer registration and cashier). Run the tests with
+`pytest` (or `python test_db.py`).
 
 ## Project structure
 
 ```
-db.py        database layer (customers, points, transactions)
-wallet.py    Google Wallet API integration
-demo.py      demo script for the full flow
-...          web app and HTML pages (customer registration, cashier)
+app.py             web app (FastAPI): registration, card and cashier routes
+db.py              database layer (customers, points, transactions)
+wallet.py          Google Wallet API integration
+add_stamp.py       script to add a stamp to a customer's card
+setup_demo.py      creates a demo cafe for testing
+demo.py            demo script for the full flow
+templates/         HTML pages (register, card, cashier, cashier login)
+index.html         landing page
+test_app.py, test_db.py, wallet_test.py   tests
 ```
-
-<!-- TODO: update this list to match the real files -->
 
 ## Security and privacy
 
