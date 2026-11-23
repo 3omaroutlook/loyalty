@@ -61,11 +61,13 @@ git clone https://github.com/3omaroutlook/loyalty.git
 cd loyalty
 python -m venv .venv
 # Windows: .venv\Scripts\activate    |    Linux/macOS: source .venv/bin/activate
-pip install fastapi uvicorn google-auth requests
+pip install fastapi uvicorn jinja2 python-multipart itsdangerous google-auth requests
 ```
 
-Copy `.env.example` to `.env` and fill in your own values. **Never commit your service
-account key or your `.env` file.**
+Put your Google service account key in the project folder as `service-account.json` (or point
+`WALLET_KEY_FILE` to it), and set `WALLET_ISSUER_ID` and `SESSION_SECRET` (see `.env.example`).
+**Never commit your service account key or any real secrets** (`.gitignore` already excludes
+`*.json`, `.env` and local databases).
 
 ### Run
 
@@ -74,8 +76,11 @@ python setup_demo.py        # creates a demo cafe in the local database
 uvicorn app:app --reload
 ```
 
-Then open the pages served by the app (customer registration and cashier). Run the tests with
-`pytest` (or `python test_db.py`).
+Then open the pages served by the app: customer registration at `/c/demo_cafe` and the cashier
+page at `/cashier/demo_cafe` (the demo cashier PIN is set in `setup_demo.py`, for testing only).
+The interface is in Egyptian Arabic (RTL).
+
+Run the tests with `python test_db.py` and `python test_app.py` (`pip install httpx` first).
 
 ## Project structure
 
@@ -83,12 +88,13 @@ Then open the pages served by the app (customer registration and cashier). Run t
 app.py             web app (FastAPI): registration, card and cashier routes
 db.py              database layer (customers, points, transactions)
 wallet.py          Google Wallet API integration
-add_stamp.py       script to add a stamp to a customer's card
+add_stamp.py       early test script that patches a test card on Google Wallet
 setup_demo.py      creates a demo cafe for testing
-demo.py            demo script for the full flow
+demo.py            interactive demo: register, add to Wallet, live stamp update
 templates/         HTML pages (register, card, cashier, cashier login)
 index.html         landing page
-test_app.py, test_db.py, wallet_test.py   tests
+test_app.py, test_db.py   tests (web layer and database)
+wallet_test.py     early Google Wallet API test
 ```
 
 ## Security and privacy
