@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}الكاشير{% endblock %}
+{% block body %}
+<div class="card">
+  <img class="logo" src="{{ cafe.logo_url }}" alt="">
+  <h1>{{ cafe.name }} — الكاشير</h1>
+  <label for="phone">رقم موبايل العميل</label>
+  <input id="phone" type="tel" inputmode="numeric" autocomplete="off" placeholder="01xxxxxxxxx">
+  <button class="btn" id="stamp" type="button">+1 ختم</button>
+  <button class="btn alt" id="redeem" type="button">صرف مكافأة</button>
+  <div id="msg"></div>
+  <form method="post" action="/cashier/{{ cafe.slug }}/logout">
+    <button class="btn alt" style="margin-top:1.8rem" type="submit">خروج</button>
+  </form>
+</div>
+<script>
+const slug = {{ cafe.slug|tojson }};
+const phone = document.getElementById('phone');
+const msg = document.getElementById('msg');
+const buttons = [document.getElementById('stamp'), document.getElementById('redeem')];
+
+// مفتاح فريد لكل عملية: لو الضغطة اتبعتت مرتين (النت قطع مثلًا) السيرفر مش هيسجّلها مرتين
+function newKey() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+}
+const keys = { stamp: newKey(), redeem: newKey() };
+
+function show(text, cls, warning) {
+  msg.textContent = '';
+  const d = document.createElement('div');
+  d.className = cls; d.textContent = text;
+  msg.appendChild(d);
+  if (warning) {
+    const w = document.createElement('div');
+    w.className = 'warn'; w.textContent = warning;
+    msg.appendChild(w);
+  }
+}
+
+async function act(kind) {
+  buttons.forEach(b => b.disabled = true);
+  try {
+    const r = await fetch('/cashier/' + slug + '/' + kind, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({phone: phone.value, key: keys[kind]})
+    });
+    if (r.status === 401) { location.reload(); return; }
+    const d = await r.json();
+    show(d.message, d.ok ? 'ok' : 'err', d.warning);
+    keys[kind] = newKey();               // وصلنا رد واضح، العملية الجاية ليها مفتاح جديد
+    if (d.ok) { phone.value = ''; phone.focus(); }
+  } catch (e) {
+    show('مفيش اتصال. اضغط تاني، ومش هتتسجّل مرتين.', 'err');   // نفس المفتاح محتفظ بيه
+  } finally {
+    buttons.forEach(b => b.disabled = false);
+  }
+}
+document.getElementById('stamp').addEventListener('click', () => act('stamp'));
+document.getElementById('redeem').addEventListener('click', () => act('redeem'));
+</script>
+{% endblock %}

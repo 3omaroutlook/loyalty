@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}دخول الكاشير{% endblock %}
+{% block body %}
+<div class="card">
+  <img class="logo" src="{{ cafe.logo_url }}" alt="">
+  <h1>{{ cafe.name }} — دخول الكاشير</h1>
+  {% if error %}<div class="err">{{ error }}</div>{% endif %}
+  <form method="post" action="/cashier/{{ cafe.slug }}/login">
+    <label for="pin">كود الكاشير</label>
+    <input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="off" required>
+    <button class="btn" type="submit">دخول</button>
+  </form>
+</div>
+{% endblock %}

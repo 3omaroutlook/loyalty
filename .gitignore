@@ -1,0 +1,24 @@
+# Secrets - NEVER commit these
+.env
+*.json
+!package.json
+service-account*.json
+*-key.json
+credentials*
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ cafe.name }}{% endblock %}
+{% block body %}
+<div class="card">
+  <img class="logo" src="{{ cafe.logo_url }}" alt="">
+  <h1>{{ cafe.name }}</h1>
+  <p class="sub">كل {{ cafe.stamps_required }} ختم = {{ cafe.reward_text }}</p>
+  {% if error %}<div class="err">{{ error }}</div>{% endif %}
+  <form method="post" action="/c/{{ cafe.slug }}/register">
+    <label for="name">الاسم</label>
+    <input id="name" name="name" type="text" autocomplete="name" required maxlength="60" value="{{ name or '' }}">
+    <label for="phone">رقم الموبايل</label>
+    <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" required placeholder="01xxxxxxxxx" value="{{ phone or '' }}">
+    <label class="consent">
+      <input type="checkbox" name="agree" value="yes" required>
+      <span>أوافق على استخدام اسمي ورقم موبايلي من {{ cafe.name }} لتشغيل برنامج الولاء فقط (تسجيل الأختام والمكافآت). لن يتم بيع الرقم أو مشاركته مع أي جهة، ويمكنني طلب حذف بياناتي في أي وقت من الكافيه.</span>
+    </label>
+    <button class="btn" type="submit">احصل على كارت الولاء</button>
+  </form>
+</div>
+{% endblock %}
